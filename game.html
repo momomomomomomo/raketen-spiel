@@ -139,11 +139,11 @@
         }
 
         function update() {
-            if (KEY_UP) {
+            if (KEY_UP && rocket.y >=0) {
                 rocket.y -= 5;
             }
 
-            if (KEY_DOWN) {
+            if (KEY_DOWN && rocket.y <=420) {
                 rocket.y += 5;
             }
 
