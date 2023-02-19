@@ -101,8 +101,7 @@
                     if (shot.x + shot.width > ufo.x &&
                         shot.y + shot.height > ufo.y &&
                         shot.x < ufo.x &&
-                        shot.y < ufo.y + ufo.height &&
-                        shot.x <= 620
+                        shot.y < ufo.y + ufo.height
                     ) {
                         ufo.hit = true;
                         ufo.img.src = 'img/boom.png';
