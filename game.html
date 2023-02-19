@@ -19,6 +19,7 @@
         let canvas;
         let ctx;
         let backgroundImage = new Image();
+        let gameoverScreen = new Image();
 
         let rocket = {
             x: 50,
@@ -26,6 +27,13 @@
             width: 100,
             height: 50,
             src: 'img/rocket.png'
+        };
+
+        let gameover = {
+            x: 720,
+            y: 480,
+            src: 'img/gameover.png',
+            value: false
         };
 
         let ufos = [];
@@ -82,7 +90,8 @@
                     rocket.y < ufo.y + ufo.height
                 ) {
                     rocket.img.src = 'img/boom.png';
-                    console.log('Collion!!!');
+                    gameover.value = true;
+                    console.log('Boom!!!');
                     ufos = ufos.filter(u => u != ufo);
                 }
 
@@ -92,11 +101,12 @@
                     if (shot.x + shot.width > ufo.x &&
                         shot.y + shot.height > ufo.y &&
                         shot.x < ufo.x &&
-                        shot.y < ufo.y + ufo.height
+                        shot.y < ufo.y + ufo.height &&
+                        shot.x <= 620
                     ) {
                         ufo.hit = true;
                         ufo.img.src = 'img/boom.png';
-                        console.log('Collion!!!');
+                        console.log('Ufo Hit!!!');
 
                         setTimeout(() => {
                             ufos = ufos.filter(u => u != ufo);
@@ -111,7 +121,7 @@
         function createUfos() {
             let ufo = {
                 x: 800,
-                y: Math.random() * 500, // Wir platzieren unsere UFOs an einem zufälligen Ort
+                y: Math.random() * 400, // Wir platzieren unsere UFOs an einem zufälligen Ort
                 width: 100,
                 height: 40,
                 src: 'img/ufo.png',
@@ -155,7 +165,9 @@
 
 
             shots.forEach(function(shot) {
-                shot.x += 15;
+                if (shot.x <=520){
+                    shot.x += 15;
+                }
             });
         }
 
@@ -163,24 +175,36 @@
             backgroundImage.src = 'img/background.png';
             rocket.img = new Image();
             rocket.img.src = rocket.src;
+            gameoverScreen.src = 'img/gameover.png'
         }
 
         function draw() {
-            ctx.drawImage(backgroundImage, 0, 0);
-            ctx.drawImage(rocket.img, rocket.x, rocket.y, rocket.width, rocket.height);
-
-            ufos.forEach(function(ufo) {
+            if (gameover.value != true) {
+                ctx.drawImage(backgroundImage, 0, 0);
+                ctx.drawImage(rocket.img, rocket.x, rocket.y, rocket.width, rocket.height);
+                ufos.forEach(function(ufo) {
                 ctx.drawImage(ufo.img, ufo.x, ufo.y, ufo.width, ufo.height);
             });
-
 
             shots.forEach(function(shot) {
                 ctx.drawImage(shot.img, shot.x, shot.y, shot.width, shot.height);
             });
 
-
+        } else {
+            ctx.drawImage(gameoverScreen, 0, 0);
+            
+        }
             requestAnimationFrame(draw);
         }
+
+        function sleep(milliseconds) {
+            const date = Date.now();
+            let currentDate = null;
+            do {
+                currentDate = Date.now();
+            } while (currentDate - date < milliseconds);
+       }
+
     </script>
 </head>
 
