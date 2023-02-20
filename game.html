@@ -20,6 +20,8 @@
         let ctx;
         let backgroundImage = new Image();
         let gameoverScreen = new Image();
+        let hitcounter = 0; 
+        let hitcountertext = "Hitcounter: ";
 
         let rocket = {
             x: 50,
@@ -30,9 +32,6 @@
         };
 
         let gameover = {
-            x: 720,
-            y: 480,
-            src: 'img/gameover.png',
             value: false
         };
 
@@ -69,15 +68,43 @@
             }
         }
 
-        function startGame() {
+        function startGame() {       
             canvas = document.getElementById('canvas');
             ctx = canvas.getContext('2d');
+            ctx.font = "30px Comic Sans MS";
+            ctx.fillStyle = "red";
+           
             loadImages();
+
+            ctx.fillText(hitcountertext + hitcounter, 510, 30);
+
             setInterval(update, 1000 / 25);
             setInterval(createUfos, 5000);
             setInterval(checkForCollion, 1000 / 25);
             setInterval(checkForShoot, 1000 / 10); // Deine Hausaufgabe
             draw();
+        }
+        function stopGame() {
+            //canvas = document.getElementById('canvas');
+            //ctx = canvas.getContext('2d');
+            //loadImages();
+            console.log('Game is over!')
+            ctx.drawImage(gameoverScreen, 0, 0);
+            ctx.font = "50px Comic Sans MS";
+            hitcountertext = "Hitcounter: "
+            ctx.textAlign = "left";
+            ctx.fillText(hitcountertext + hitcounter, 160,50);
+            ctx.fillText("Bitte Cmd + R drücken", 80,400);
+            clearInterval(update);
+            clearInterval(createUfos);
+            clearInterval(checkForCollion);
+            clearInterval(checkForShoot);
+            clearInterval(draw);
+            window.stop();
+            console.log("Script stoped!");
+            
+          
+            //requestAnimationFrame(draw);
         }
 
         function checkForCollion() {
@@ -87,31 +114,41 @@
                 if (rocket.x + rocket.width > ufo.x &&
                     rocket.y + rocket.height > ufo.y &&
                     rocket.x < ufo.x &&
-                    rocket.y < ufo.y + ufo.height
+                    rocket.y < ufo.y + ufo.height ||
+                    ufo.x <= 0
                 ) {
                     rocket.img.src = 'img/boom.png';
                     gameover.value = true;
                     console.log('Boom!!!');
                     ufos = ufos.filter(u => u != ufo);
-                }
+                    
+                } 
+
 
                 // Deine Hausaufgabe
                 shots.forEach(function(shot) {
+                 
                     // Kontrollieren, ob Laser mit Rakete kollidiert
                     if (shot.x + shot.width > ufo.x &&
                         shot.y + shot.height > ufo.y &&
                         shot.x < ufo.x &&
-                        shot.y < ufo.y + ufo.height
+                        shot.y < ufo.y + ufo.height &&
+                        !ufo.hit
                     ) {
                         ufo.hit = true;
                         ufo.img.src = 'img/boom.png';
                         console.log('Ufo Hit!!!');
+                        hitcounter = hitcounter +1;
 
                         setTimeout(() => {
                             ufos = ufos.filter(u => u != ufo);
+                            shots = shots.filter(u => u != shot);
                         }, 2000);
                     }
-
+                    setTimeout(() => {
+                            shots = shots.filter(u => u != shot);
+                            shot.counter = 0;
+                        }, 3000);
                 });
 
             });
@@ -139,10 +176,12 @@
                     width: 20,
                     height: 4,
                     src: 'img/shot.png',
-                    img: new Image()
+                    img: new Image(),
+                    counter: 0
                 };
                 shot.img.src = shot.src; // Laser-Bild wird geladen.
-
+                shot.counter = shot.counter + 1;
+                console.log(shot.counter);
                 shots.push(shot);
             }
         }
@@ -164,7 +203,7 @@
 
 
             shots.forEach(function(shot) {
-                if (shot.x <=520){
+                if (shot.x <=720){
                     shot.x += 15;
                 }
             });
@@ -178,22 +217,24 @@
         }
 
         function draw() {
+
             if (gameover.value != true) {
                 ctx.drawImage(backgroundImage, 0, 0);
                 ctx.drawImage(rocket.img, rocket.x, rocket.y, rocket.width, rocket.height);
                 ufos.forEach(function(ufo) {
                 ctx.drawImage(ufo.img, ufo.x, ufo.y, ufo.width, ufo.height);
+               
+                ctx.fillText(hitcountertext + hitcounter, 510, 30);
             });
 
             shots.forEach(function(shot) {
                 ctx.drawImage(shot.img, shot.x, shot.y, shot.width, shot.height);
             });
-
-        } else {
-            ctx.drawImage(gameoverScreen, 0, 0);
-            
-        }
             requestAnimationFrame(draw);
+        } else {
+            stopGame();
+        }
+  
         }
 
         function sleep(milliseconds) {
